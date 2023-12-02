@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script>
+        function validateForm() {
+            var textInput = document.getElementById('textPrompt').value;
+            var fileInput = document.getElementById('fileInput').value;
+
+            if (textInput.trim() === '' && fileInput.trim() === '') {
+                alert('Please fill in either the text prompt or upload a file.');
+                return false; //can't submit form
+            }
+
+            return true; //can submit form
+        }
+    </script>
+</head>
+<body>
+    <h1>Recommender 101</h1>
+    
+    <form method="post" action="{% url 'process' %}" enctype="multipart/form-data" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <label for="textPrompt">Text Prompt:</label>
+        <textarea name="textPrompt" id="textPrompt" rows="4" cols="50" maxlength="2000"></textarea>
+        <br>
+
+       
+        <label for="fileInput">Upload Image:</label>
+        <input type="file" name="fileInput" id="fileInput" accept="image/*">
+        <br>
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
