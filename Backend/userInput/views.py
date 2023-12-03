@@ -134,7 +134,7 @@ def mood_caluclate(request):
         y = np.argmax(y)
         mood_score = sentiment_mapping[str(y)]
 
-        username = 'kb'
+        username = request.data['username']
         mood = float(mood_score)
         main_function(username, mood)
         return Response(mood_score)
