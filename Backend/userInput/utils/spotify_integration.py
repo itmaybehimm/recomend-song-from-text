@@ -4,24 +4,28 @@ import spotipy
 import spotipy.util as util
 import random
 
+
 def main_function(username, mood):
-    #herehere
+    # herehere
     client_id = "b9472a6206cf4ac894186ec4b42ded9b"
     client_secret = "e40b0947da564b0b8bf96d1d4fe300f7"
+    # client_id = "9090ca68bbc84801b36c3b97a2575cea"
+    # client_secret = "6eea8e1b6a334c5d949a479c3f96a504"
     redirect_uri = "https://localhost:8000/"
 
     scope = 'user-library-read user-top-read playlist-modify-public user-follow-read'
 
-    token = util.prompt_for_user_token(username, scope, client_id, client_secret, redirect_uri)
+    token = util.prompt_for_user_token(
+        username, scope, client_id, client_secret, redirect_uri)
 
     if token:
-        #Step 1. Authenticating Spotipy
+        # Step 1. Authenticating Spotipy
         def authenticate_spotify():
             print('...connecting to Spotify')
             sp = spotipy.Spotify(auth=token)
             return sp
 
-        #Step 2. Creating a list of your favorite artists
+        # Step 2. Creating a list of your favorite artists
         def aggregate_top_artists(sp):
             print('...getting your top artists')
             top_artists_name = []
@@ -29,14 +33,16 @@ def main_function(username, mood):
 
             ranges = ['short_term', 'medium_term', 'long_term']
             for r in ranges:
-                top_artists_all_data = sp.current_user_top_artists(limit=50, time_range= r)
+                top_artists_all_data = sp.current_user_top_artists(
+                    limit=50, time_range=r)
                 top_artists_data = top_artists_all_data['items']
                 for artist_data in top_artists_data:
-                    if artist_data["name"] not in top_artists_name:		
+                    if artist_data["name"] not in top_artists_name:
                         top_artists_name.append(artist_data['name'])
                         top_artists_uri.append(artist_data['uri'])
 
-            followed_artists_all_data = sp.current_user_followed_artists(limit=50)
+            followed_artists_all_data = sp.current_user_followed_artists(
+                limit=50)
             followed_artists_data = (followed_artists_all_data['artists'])
             for artist_data in followed_artists_data["items"]:
                 if artist_data["name"] not in top_artists_name:
@@ -44,9 +50,8 @@ def main_function(username, mood):
                     top_artists_uri.append(artist_data['uri'])
             return top_artists_uri
 
+        # Step 3. For each of the artists, get a set of tracks for each artist
 
-        #Step 3. For each of the artists, get a set of tracks for each artist
-        
         def aggregate_top_tracks(sp, top_artists_uri):
             print("...getting top tracks")
             top_tracks_uri = []
@@ -59,7 +64,7 @@ def main_function(username, mood):
 
         # Step 4. From top tracks, select tracks that are within a certain mood range
         def select_tracks(sp, top_tracks_uri):
-            
+
             print("...selecting tracks")
             selected_tracks_uri = []
 
@@ -69,43 +74,43 @@ def main_function(username, mood):
             random.shuffle(top_tracks_uri)
             for tracks in list(group(top_tracks_uri, 50)):
                 tracks_all_data = sp.audio_features(tracks)
-                
+
                 for track_data in tracks_all_data:
                     try:
                         if mood < 0.10:
                             if (0 <= track_data["valence"] <= (mood + 0.15)
-                            and track_data["danceability"] <= (mood*8)
-                            and track_data["energy"] <= (mood*10)):
-                                selected_tracks_uri.append(track_data["uri"])					
-                        elif 0.10 <= mood < 0.25:						
-                            if ((mood - 0.075) <= track_data["valence"] <= (mood + 0.075)
-                            and track_data["danceability"] <= (mood*4)
-                            and track_data["energy"] <= (mood*5)):
+                                and track_data["danceability"] <= (mood*8)
+                                    and track_data["energy"] <= (mood*10)):
                                 selected_tracks_uri.append(track_data["uri"])
-                        elif 0.25 <= mood < 0.50:						
+                        elif 0.10 <= mood < 0.25:
+                            if ((mood - 0.075) <= track_data["valence"] <= (mood + 0.075)
+                                and track_data["danceability"] <= (mood*4)
+                                    and track_data["energy"] <= (mood*5)):
+                                selected_tracks_uri.append(track_data["uri"])
+                        elif 0.25 <= mood < 0.50:
                             if ((mood - 0.05) <= track_data["valence"] <= (mood + 0.05)
-                            and track_data["danceability"] <= (mood*1.75)
-                            and track_data["energy"] <= (mood*1.75)):
+                                and track_data["danceability"] <= (mood*1.75)
+                                    and track_data["energy"] <= (mood*1.75)):
                                 selected_tracks_uri.append(track_data["uri"])
-                        elif 0.50 <= mood < 0.75:						
+                        elif 0.50 <= mood < 0.75:
                             if ((mood - 0.075) <= track_data["valence"] <= (mood + 0.075)
-                            and track_data["danceability"] >= (mood/2.5)
-                            and track_data["energy"] >= (mood/2)):
+                                and track_data["danceability"] >= (mood/2.5)
+                                    and track_data["energy"] >= (mood/2)):
                                 selected_tracks_uri.append(track_data["uri"])
-                        elif 0.75 <= mood < 0.90:						
+                        elif 0.75 <= mood < 0.90:
                             if ((mood - 0.075) <= track_data["valence"] <= (mood + 0.075)
-                            and track_data["danceability"] >= (mood/2)
-                            and track_data["energy"] >= (mood/1.75)):
+                                and track_data["danceability"] >= (mood/2)
+                                    and track_data["energy"] >= (mood/1.75)):
                                 selected_tracks_uri.append(track_data["uri"])
                         elif mood >= 0.90:
                             if ((mood - 0.15) <= track_data["valence"] <= 1
-                            and track_data["danceability"] >= (mood/1.75)
-                            and track_data["energy"] >= (mood/1.5)):
+                                and track_data["danceability"] >= (mood/1.75)
+                                    and track_data["energy"] >= (mood/1.5)):
                                 selected_tracks_uri.append(track_data["uri"])
                     except TypeError as te:
                         continue
 
-            return selected_tracks_uri			
+            return selected_tracks_uri
 
         # Step 5. From these tracks, create a playlist for user
         def create_playlist(sp, selected_tracks_uri):
@@ -114,12 +119,13 @@ def main_function(username, mood):
             user_all_data = sp.current_user()
             user_id = user_all_data["id"]
 
-            playlist_all_data = sp.user_playlist_create(user_id, "moodtape " + str(mood))
+            playlist_all_data = sp.user_playlist_create(
+                user_id, "moodtape " + str(mood))
             playlist_id = playlist_all_data["id"]
 
             random.shuffle(selected_tracks_uri)
-            sp.user_playlist_add_tracks(user_id, playlist_id, selected_tracks_uri[0:30])
-
+            sp.user_playlist_add_tracks(
+                user_id, playlist_id, selected_tracks_uri[0:30])
 
         spotify_auth = authenticate_spotify()
         top_artists = aggregate_top_artists(spotify_auth)
@@ -129,7 +135,6 @@ def main_function(username, mood):
 
     else:
         print("Can't get token for", username)
-
 
     # Example modification for demonstration:
     print(f"Integration complete for {username} with mood {mood}")

@@ -86,7 +86,7 @@ def integrate_spotify(request, username, mood):
 
 @api_view(['POST'])
 def mood_caluclate(request):
-    with open('userInput/countvectorizer_2.pkl', 'rb') as f:
+    with open('userInput/countvectorizer.pkl', 'rb') as f:
         count_vectorizer = pickle.load(f)
 
         sentiment_mapping = {
@@ -116,11 +116,11 @@ def mood_caluclate(request):
              tf.keras.layers.Dense(units=400, activation='relu'),
              tf.keras.layers.Dense(units=260, activation='relu'),
              tf.keras.layers.Dense(units=30, activation='relu'),
-             tf.keras.layers.Dense(units=8, activation='linear')])
+             tf.keras.layers.Dense(units=6, activation='linear')])
 
         model.compile(loss=loss, optimizer=opt, metrics='accuracy')
 
-        model.load_weights('userInput/model_2.h5')
+        model.load_weights('userInput/model.h5')
 
         X = [
             str(request.data['feel'])
