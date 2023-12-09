@@ -1,5 +1,3 @@
-# recomend-song-from-text-image
-
 ## Setup
 
 1. Clone the repository:
@@ -57,7 +55,7 @@ Folder structure for dataset:
 2. Run the train_model.ipynb notebook to train your own model by tweaking architecture
 3. Move model.h5 and countvectorizer.pkl files to recomend-song-from-text/backend/userInput directory
 
-## frontend
+## Frontend
 
 After navigating to frontend folder
   ```bash
@@ -66,7 +64,7 @@ After navigating to frontend folder
 
 follow instructions afterwards
 
-## backend
+## Backend
 
 After navigating to backend folder
   ```bash
